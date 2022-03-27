@@ -8,6 +8,8 @@ public class ResourcesSystem : MonoBehaviour
     [Header("Main")]
     [SerializeField] private Resources resourcePrefabs;
 
+    public Resources Resources { get { return resourcePrefabs; } }
+
     private void Awake()
     {
         // Static

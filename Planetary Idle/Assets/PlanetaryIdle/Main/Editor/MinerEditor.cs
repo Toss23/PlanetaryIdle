@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(Miner))]
 public class MinerEditor : Editor
@@ -17,6 +18,10 @@ public class MinerEditor : Editor
     private SerializedProperty level;
     private SerializedProperty configuration;
 
+    // Resources System
+    private ResourcesSystem resourcesSystem;
+    private string[] resourceIdentifiers;
+
     private void OnEnable()
     {
         mainTitle = new GUIStyle();
@@ -28,6 +33,30 @@ public class MinerEditor : Editor
         resourceIdentifier = serializedObject.FindProperty("resourceIdentifier");
         level = serializedObject.FindProperty("level");
         configuration = serializedObject.FindProperty("configuration");
+
+        // Build Resource Identifiers Array
+        GameObject gameObject = GameObject.FindWithTag("ResourcesSystem");
+        if (gameObject != null)
+        {
+            resourcesSystem = gameObject.GetComponent<ResourcesSystem>();
+            ResourcePrefab[] prefabs = resourcesSystem.Resources.Prefabs;
+            List<string> identifiers = new List<string>();
+
+            // Build List
+            for (int index = 0; index < prefabs.Length; index++)
+            {
+                identifiers.Add(prefabs[index].Identifier);
+                if (prefabs[index].HaveMaximum)
+                    identifiers.Add(prefabs[index].IdentifierMaximum);
+            }
+
+            // Convert List to Array
+            resourceIdentifiers = new string[identifiers.Count];
+            for (int index = 0; index < resourceIdentifiers.Length; index++)
+            {
+                resourceIdentifiers[index] = identifiers[index];
+            }
+        }
     }
 
     public override void OnInspectorGUI()
@@ -40,18 +69,41 @@ public class MinerEditor : Editor
         GUILayout.EndHorizontal();
         GUILayout.Space(space * 2);
 
-        /* Resource identifier
-        GUILayout.BeginHorizontal();
+        // Resource
         int index = 0;
-        for (int i = 0; i < ResourcesEditor.ResourceIdentifiers.Length; i++)
+        for (int i = 0; i < resourceIdentifiers.Length; i++)
         {
-            if (ResourcesEditor.ResourceIdentifiers[i] == resourceIdentifier.stringValue)
+            if (resourceIdentifiers[i] == resourceIdentifier.stringValue)
+            {
                 index = i;
+                break;
+            }
         }
-        index = EditorGUILayout.Popup(index, ResourcesEditor.ResourceIdentifiers);
-        resourceIdentifier.stringValue = ResourcesEditor.ResourceIdentifiers[index];
-        GUILayout.EndHorizontal();
-        */
+
+        if (resourcesSystem != null)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Resource: ", GUILayout.Width(textWidth));
+            index = EditorGUILayout.Popup(index, resourceIdentifiers, GUILayout.Width(fieldWidth));
+            resourceIdentifier.stringValue = resourceIdentifiers[index];
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Level: ", GUILayout.Width(textWidth));
+            level.intValue = EditorGUILayout.IntField(level.intValue, GUILayout.Width(fieldWidth));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Configuration: ", GUILayout.Width(textWidth));
+            configuration.objectReferenceValue = EditorGUILayout.ObjectField(configuration.objectReferenceValue, typeof(MinerConfiguration), true, GUILayout.Width(fieldWidth));
+            GUILayout.EndHorizontal();
+        }
+        else
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Please create Resources System component and mark by Tag");
+            GUILayout.EndHorizontal();
+        }
 
         serializedObject.ApplyModifiedProperties();
     }
