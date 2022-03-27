@@ -1,9 +1,13 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(Resources))]
 public class ResourcesEditor : Editor
 {
+    public static string[] ResourceIdentifiers;
+    private static List<string> resourceIdentifiersList;
+
     // Style Configuration
     private Color defaultColor;
     private GUIStyle mainTitle;
@@ -21,6 +25,7 @@ public class ResourcesEditor : Editor
     private SerializedProperty prefabs;
     private int arraySize;
     private bool[] deleteElements;
+    private bool push;
 
     private void OnEnable()
     {
@@ -37,6 +42,10 @@ public class ResourcesEditor : Editor
         subTitle.fontSize = 16;
 
         prefabs = serializedObject.FindProperty("prefabs");
+        push = false;
+
+        if (resourceIdentifiersList == null) resourceIdentifiersList = new List<string>();
+        if (ResourceIdentifiers == null) ResourceIdentifiers = new string[0];
     }
 
     public override void OnInspectorGUI()
@@ -46,6 +55,12 @@ public class ResourcesEditor : Editor
         // Title
         GUILayout.BeginHorizontal();
         GUILayout.Label("Resources", mainTitle);
+        GUI.backgroundColor = Color.cyan;
+        if (GUILayout.Button("Push to List", GUILayout.MaxWidth(textWidth)))
+        {
+            push = true;
+        }
+        GUI.backgroundColor = defaultColor;
         GUILayout.EndHorizontal();
         GUILayout.Space(space * 2);
 
@@ -64,6 +79,22 @@ public class ResourcesEditor : Editor
         for (int index = 0; index < deleteElements.Length; index++)
             if (deleteElements[index])
                 prefabs.DeleteArrayElementAtIndex(index);
+
+        // Push resource identifiers to Array
+        if (push)
+        {
+            // Build List
+            resourceIdentifiersList.Clear();
+            for (int index = 0; index < arraySize; index++)
+                AddResourceIdentifierToList(index);
+
+            // Convert List to Array
+            ResourceIdentifiers = new string[resourceIdentifiersList.Count];
+            for (int index = 0; index < resourceIdentifiersList.Count; index++)
+                ResourceIdentifiers[index] = resourceIdentifiersList[index];
+
+            push = false;
+        }
 
         serializedObject.ApplyModifiedProperties();
     }
@@ -218,5 +249,17 @@ public class ResourcesEditor : Editor
         }
 
         GUILayout.EndVertical();
+    }
+
+    private void AddResourceIdentifierToList(int index)
+    {
+        SerializedProperty prefab = prefabs.GetArrayElementAtIndex(index);
+        SerializedProperty identifier = prefab.FindPropertyRelative("identifier");
+        SerializedProperty haveMaximum = prefab.FindPropertyRelative("haveMaximum");
+        SerializedProperty identifierMaximum = prefab.FindPropertyRelative("identifierMaximum");
+
+        resourceIdentifiersList.Add(identifier.stringValue);
+        if (haveMaximum.boolValue)
+            resourceIdentifiersList.Add(identifierMaximum.stringValue);
     }
 }

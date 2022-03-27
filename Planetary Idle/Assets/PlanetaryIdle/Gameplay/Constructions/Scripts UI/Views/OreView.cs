@@ -30,9 +30,9 @@ public class OreView : View
 
     protected override void OnClickUpgrade()
     {
-        //Resource Gold = ResourcesSystem.Find("Gold");
-        //if (Gold.Spend(selectedOre.MinerPrice))
-            //selectedOre.BuildMiner();
+        Resource Gold = ResourcesSystem.Find("Gold");
+        if (Gold.Spend(selectedOre.MinerPrice))
+            selectedOre.BuildMiner();
     }
 
     protected override void OnClickDestroy() { }

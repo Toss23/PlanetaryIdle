@@ -4,7 +4,6 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(BoxCollider))]
 public class Miner : MonoBehaviour, IPointerClickHandler
 {
-    [Header("Main")]
     [SerializeField] private string resourceIdentifier;
     [SerializeField] private int level;
     [SerializeField] private MinerConfiguration configuration;
@@ -22,7 +21,7 @@ public class Miner : MonoBehaviour, IPointerClickHandler
 
     private void Start()
     {
-        //resource = ResourcesSystem.Find(resourceIdentifier);
+        resource = ResourcesSystem.Find(resourceIdentifier);
     }
 
     private void Update()
@@ -34,7 +33,7 @@ public class Miner : MonoBehaviour, IPointerClickHandler
             productionTimer = configuration.ProdutionInterval;
 
             // Action on production circle end
-            //resource.Add(configuration.Productions[level]);
+            resource.Add(configuration.Productions[level]);
         }
     }
 
