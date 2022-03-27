@@ -19,7 +19,7 @@ public class ResourcesSystem : MonoBehaviour
         foreach (ResourcePrefab resource in resourcePrefabs.Prefabs)
         {
             if (resource.HaveMaximum)
-                Resource.Create(resource.Identifier, transform, resource.IdentifierMaximum);
+                Resource.Create(resource.Identifier, transform, resource.IdentifierMaximum, resource.Maximum);
             else
                 Resource.Create(resource.Identifier, transform);
         }

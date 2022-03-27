@@ -7,6 +7,7 @@ public class OreView : View
 
     [Header("View")]
     [SerializeField] private Text oreNameText;
+    [SerializeField] private Text productionText;
     [SerializeField] private Text upgradeText;
 
     private Ore selectedOre;
@@ -25,13 +26,13 @@ public class OreView : View
     protected override void UpdateView()
     {
         Instance.oreNameText.text = "Name: " + selectedOre.DisplayName;
-        Instance.upgradeText.text = "Buy (" + selectedOre.MinerPrice + " Gold)";
+        Instance.productionText.text = "Produce: " + selectedOre.Production + " " + selectedOre.DisplayName + " / Sec";
+        Instance.upgradeText.text = "Build Miner (" + selectedOre.MinerPrice + " Gold)";
     }
 
     protected override void OnClickUpgrade()
     {
-        Resource Gold = ResourcesSystem.Find("Gold");
-        if (Gold.Spend(selectedOre.MinerPrice))
+        if (ResourcesSystem.Find("Gold").Spend(selectedOre.MinerPrice))
             selectedOre.BuildMiner();
     }
 

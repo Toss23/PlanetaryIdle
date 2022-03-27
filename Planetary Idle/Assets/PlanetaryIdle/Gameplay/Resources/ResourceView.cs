@@ -14,7 +14,7 @@ public class ResourceView : MonoBehaviour
     private void Start()
     {
         text = GetComponent<Text>();
-        //resource = ResourcesSystem.Find(resourceName);
+        resource = ResourcesSystem.Find(resourceName);
     }
 
     private void Update()
@@ -22,7 +22,7 @@ public class ResourceView : MonoBehaviour
         if (resource != null)
         {
             if (displayMaximum)
-                text.text = resource.Identifier + ": " + resource.Count + "/" + resource.Maximum;
+                text.text = resource.Identifier + ": " + resource.Count + "/" + resource.Maximum.Count;
             else
                 text.text = resource.Identifier + ": " + resource.Count;
         }

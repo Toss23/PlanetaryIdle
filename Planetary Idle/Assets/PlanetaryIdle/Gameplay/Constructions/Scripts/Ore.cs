@@ -15,6 +15,7 @@ public class Ore : MonoBehaviour, IPointerClickHandler
     private bool minerBuilded = false;
 
     public string DisplayName { get { return displayName; } }
+    public int Production { get { return minerPrefab.Configuration.Productions[1]; } }
     public int MinerPrice { get { return minerPrefab.Configuration.Prices[0]; } }
 
     private void Awake()
