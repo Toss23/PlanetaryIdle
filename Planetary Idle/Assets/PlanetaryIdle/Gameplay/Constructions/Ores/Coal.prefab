@@ -465,10 +465,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 115abd531e527654cb274fce6af72751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  oreName: Coal
-  minerPrice: 100
-  minerInstruction: {fileID: 11400000, guid: 37a2b1c40f9f5204eb6c707f0065d857, type: 2}
-  minerPrefab: {fileID: 9031687160796927861, guid: a7325891f647ad14880b713b76df0e3b, type: 3}
+  displayName: Coal
+  minerPrefab: {fileID: -793058614806385505, guid: a7325891f647ad14880b713b76df0e3b, type: 3}
   progressBar: {fileID: 4108707167558541545}
   energy: {fileID: 1999655348488589947}
 --- !u!1 &7941856934035809268
