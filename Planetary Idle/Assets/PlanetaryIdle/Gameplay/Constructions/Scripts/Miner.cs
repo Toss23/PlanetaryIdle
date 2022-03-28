@@ -6,17 +6,17 @@ public class Miner : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private string resourceIdentifier;
     [SerializeField] private int level;
-    [SerializeField] private MinerConfiguration configuration;
+    [SerializeField] private Configuration configuration;
 
     private Resource resource;
     private float productionTimer;
 
-    public MinerConfiguration Configuration { get { return configuration; } }
+    public Configuration Configuration { get { return configuration; } }
 
     private void Awake()
     {
         level = 1;
-        productionTimer = configuration.ProdutionInterval;
+        productionTimer = configuration.ProductionInterval;
     }
 
     private void Start()
@@ -30,7 +30,7 @@ public class Miner : MonoBehaviour, IPointerClickHandler
 
         if (productionTimer <= 0)
         {
-            productionTimer = configuration.ProdutionInterval;
+            productionTimer = configuration.ProductionInterval;
 
             // Action on production circle end
             resource.Add(configuration.Productions[level]);

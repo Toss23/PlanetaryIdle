@@ -7,9 +7,7 @@ public class MinerEditor : Editor
 {
     // Style Configuration
     private GUIStyle mainTitle;
-
     private int space = 5;
-
     private int textWidth = 120;
     private int fieldWidth = 200;
 
@@ -24,6 +22,7 @@ public class MinerEditor : Editor
 
     private void OnEnable()
     {
+        // Style Configuration
         mainTitle = new GUIStyle();
         mainTitle.fontStyle = FontStyle.BoldAndItalic;
         mainTitle.normal.textColor = Color.white;
@@ -35,28 +34,7 @@ public class MinerEditor : Editor
         configuration = serializedObject.FindProperty("configuration");
 
         // Build Resource Identifiers Array
-        GameObject gameObject = GameObject.FindWithTag("ResourcesSystem");
-        if (gameObject != null)
-        {
-            resourcesSystem = gameObject.GetComponent<ResourcesSystem>();
-            ResourcePrefab[] prefabs = resourcesSystem.Resources.Prefabs;
-            List<string> identifiers = new List<string>();
-
-            // Build List
-            for (int index = 0; index < prefabs.Length; index++)
-            {
-                identifiers.Add(prefabs[index].Identifier);
-                if (prefabs[index].HaveMaximum)
-                    identifiers.Add(prefabs[index].IdentifierMaximum);
-            }
-
-            // Convert List to Array
-            resourceIdentifiers = new string[identifiers.Count];
-            for (int index = 0; index < resourceIdentifiers.Length; index++)
-            {
-                resourceIdentifiers[index] = identifiers[index];
-            }
-        }
+        BuildIdentifiersArray();
     }
 
     public override void OnInspectorGUI()
@@ -95,7 +73,7 @@ public class MinerEditor : Editor
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Configuration: ", GUILayout.Width(textWidth));
-            configuration.objectReferenceValue = EditorGUILayout.ObjectField(configuration.objectReferenceValue, typeof(MinerConfiguration), true, GUILayout.Width(fieldWidth));
+            configuration.objectReferenceValue = EditorGUILayout.ObjectField(configuration.objectReferenceValue, typeof(Configuration), true, GUILayout.Width(fieldWidth));
             GUILayout.EndHorizontal();
         }
         else
@@ -106,5 +84,31 @@ public class MinerEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    private void BuildIdentifiersArray()
+    {
+        GameObject gameObject = GameObject.FindWithTag("ResourcesSystem");
+        if (gameObject != null)
+        {
+            resourcesSystem = gameObject.GetComponent<ResourcesSystem>();
+            ResourcePrefab[] prefabs = resourcesSystem.Resources.Prefabs;
+            List<string> identifiers = new List<string>();
+
+            // Build List
+            for (int index = 0; index < prefabs.Length; index++)
+            {
+                identifiers.Add(prefabs[index].Identifier);
+                if (prefabs[index].HaveMaximum)
+                    identifiers.Add(prefabs[index].IdentifierMaximum);
+            }
+
+            // Convert List to Array
+            resourceIdentifiers = new string[identifiers.Count];
+            for (int index = 0; index < resourceIdentifiers.Length; index++)
+            {
+                resourceIdentifiers[index] = identifiers[index];
+            }
+        }
     }
 }
