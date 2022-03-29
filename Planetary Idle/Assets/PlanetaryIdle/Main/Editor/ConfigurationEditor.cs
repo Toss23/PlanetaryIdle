@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -7,16 +6,6 @@ public class ConfigurationEditor : Editor
 {
     // Style Configuration
     private Color defaultColor;
-    private GUIStyle mainTitle;
-    private GUIStyle subTitle;
-
-    private int space = 5;
-    private int border = 5;
-
-    private int textWidth = 70;
-    private int fieldWidth = 100;
-    private int toggleWidth = 15;
-    private int tab = 5;
 
     // Properties
     private int levelsCount;
@@ -24,31 +13,20 @@ public class ConfigurationEditor : Editor
     private SerializedProperty haveInput;
 
     // Resources System
-    private ResourcesSystem resourcesSystem;
     private string[] resourceIdentifiers;
+    private bool[] deleteElements;
 
     private void OnEnable()
     {
         // Style Configuration
         defaultColor = GUI.backgroundColor;
 
-        mainTitle = new GUIStyle();
-        mainTitle.fontStyle = FontStyle.BoldAndItalic;
-        mainTitle.normal.textColor = Color.white;
-        mainTitle.fontSize = 18;
-
-        subTitle = new GUIStyle();
-        subTitle.fontStyle = FontStyle.BoldAndItalic;
-        subTitle.normal.textColor = Color.white;
-        subTitle.fontSize = 16;
-
         // Properties
         levels = serializedObject.FindProperty("levels");
-        levelsCount = levels.arraySize;
         haveInput = serializedObject.FindProperty("haveInput");
 
         // Build Resource Identifiers Array
-        BuildIdentifiersArray();
+        resourceIdentifiers = TEditor.ResourceIdentifiers();
     }
 
     public override void OnInspectorGUI()
@@ -57,55 +35,39 @@ public class ConfigurationEditor : Editor
 
         // Title
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Configuration", mainTitle);
+        GUILayout.Label("Configuration (" + serializedObject.targetObject.name + ")", TEditor.TitleStyle());
         GUILayout.EndHorizontal();
-        GUILayout.Space(space * 2);
+        TEditor.TitleSpace();
+
+        // Have Input
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Have Input Resource: ", GUILayout.Width(130));
+        haveInput.boolValue = EditorGUILayout.Toggle(haveInput.boolValue, GUILayout.Width(TEditor.ToggleWidth));
+        GUILayout.EndHorizontal();
+        TEditor.Space();
 
         // Levels
-        if (levelsCount == 0 || levels == null)
+        levelsCount = levels.arraySize;
+        if (levelsCount < 2 || levels == null)
         {
-            levelsCount = 1;
+            levelsCount = 2;
             levels.arraySize = levelsCount;
         }
 
-        if (resourcesSystem != null)
+        deleteElements = new bool[levelsCount];
+
+        if (resourceIdentifiers.Length != 0)
         {
             for (int level = 0; level < levelsCount; level++)
-            {
-                SerializedProperty serializedProperty = levels.GetArrayElementAtIndex(level);
-                SerializedProperty priceResource = serializedProperty.FindPropertyRelative("priceResource");
-                SerializedProperty price = serializedProperty.FindPropertyRelative("price");
+                ShowLevel(level);
 
-                GUILayout.BeginVertical(GUI.skin.button);
-                GUILayout.Space(border);
-                if (level == 0)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("", GUILayout.Width(border));
-                    GUILayout.Label("Build price", subTitle);
-                    GUILayout.EndHorizontal();
-
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("", GUILayout.Width(border));
-                    GUILayout.Label("Value: ", GUILayout.Width(textWidth));
-                    price.intValue = EditorGUILayout.IntField(price.intValue, GUILayout.Width(fieldWidth));
-                    GUILayout.Label("", GUILayout.Width(tab));
-                    GUILayout.Label("Resource: ", GUILayout.Width(textWidth));
-                    priceResource.stringValue = EditorGUILayout.TextField(priceResource.stringValue, GUILayout.Width(fieldWidth));
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-
-                }
-                GUILayout.Space(border);
-                GUILayout.EndVertical();
-                GUILayout.Space(space);
-            }
+            DeleteElement();
+            AddLevelButton();
         }
         else
         {
             GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
             GUILayout.Label("Please create Resources System component and mark by Tag");
             GUILayout.EndHorizontal();
         }
@@ -113,29 +75,135 @@ public class ConfigurationEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 
-    private void BuildIdentifiersArray()
+    private void ShowLevel(int level)
     {
-        GameObject gameObject = GameObject.FindWithTag("ResourcesSystem");
-        if (gameObject != null)
+        SerializedProperty currentLevel = levels.GetArrayElementAtIndex(level);
+        SerializedProperty priceResource = currentLevel.FindPropertyRelative("priceResource");
+        SerializedProperty price = currentLevel.FindPropertyRelative("price");
+        SerializedProperty inputResource = currentLevel.FindPropertyRelative("inputResource");
+        SerializedProperty inputCount = currentLevel.FindPropertyRelative("inputCount");
+        SerializedProperty outputResource = currentLevel.FindPropertyRelative("outputResource");
+        SerializedProperty outputCount = currentLevel.FindPropertyRelative("outputCount");
+
+        GUILayout.BeginVertical(GUI.skin.button);
+        TEditor.VerticalBorder();
+
+        if (level == 0)
         {
-            resourcesSystem = gameObject.GetComponent<ResourcesSystem>();
-            ResourcePrefab[] prefabs = resourcesSystem.Resources.Prefabs;
-            List<string> identifiers = new List<string>();
+            // Title
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            GUILayout.Label("Build price", TEditor.SubTitleStyle());
+            GUILayout.EndHorizontal();
+            TEditor.Space();
 
-            // Build List
-            for (int index = 0; index < prefabs.Length; index++)
-            {
-                identifiers.Add(prefabs[index].Identifier);
-                if (prefabs[index].HaveMaximum)
-                    identifiers.Add(prefabs[index].IdentifierMaximum);
-            }
-
-            // Convert List to Array
-            resourceIdentifiers = new string[identifiers.Count];
-            for (int index = 0; index < resourceIdentifiers.Length; index++)
-            {
-                resourceIdentifiers[index] = identifiers[index];
-            }
+            // Price
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            price.intValue = EditorGUILayout.IntField(price.intValue, GUILayout.Width(TEditor.FieldWidth));
+            TEditor.Tab();
+            int index = TEditor.GetResourceIndex(priceResource.stringValue, resourceIdentifiers);
+            index = EditorGUILayout.Popup(index, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+            priceResource.stringValue = resourceIdentifiers[index];
+            GUILayout.EndHorizontal();
         }
+        else
+        {
+            // Title
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            GUILayout.Label("Level " + level, TEditor.SubTitleStyle());
+
+            // Delete
+            if (level >= 2)
+            {
+                GUI.backgroundColor = Color.red;
+                if (GUILayout.Button("Delete", GUILayout.Width(TEditor.TextWidth)))
+                    deleteElements[level] = true;
+                GUI.backgroundColor = defaultColor;
+            }
+            GUILayout.EndHorizontal();
+            TEditor.Space();
+
+            // Price
+            GUIStyle customStyle = TEditor.SubTitleStyle();
+            customStyle.fontSize = 12;
+
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            GUILayout.Label("Price", customStyle);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            price.intValue = EditorGUILayout.IntField(price.intValue, GUILayout.Width(TEditor.FieldWidth));
+            TEditor.Tab();
+            int priceIndex = TEditor.GetResourceIndex(priceResource.stringValue, resourceIdentifiers);
+            priceIndex = EditorGUILayout.Popup(priceIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+            priceResource.stringValue = resourceIdentifiers[priceIndex];
+            GUILayout.EndHorizontal();
+
+            TEditor.Space();
+
+            // Input
+            if (haveInput.boolValue)
+            {
+                GUILayout.BeginHorizontal();
+                TEditor.HorizontalBorder();
+                GUILayout.Label("Input Resource", customStyle);
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                TEditor.HorizontalBorder();
+                inputCount.intValue = EditorGUILayout.IntField(inputCount.intValue, GUILayout.Width(TEditor.FieldWidth));
+                TEditor.Tab();
+                int inputIndex = TEditor.GetResourceIndex(inputResource.stringValue, resourceIdentifiers);
+                inputIndex = EditorGUILayout.Popup(inputIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+                inputResource.stringValue = resourceIdentifiers[inputIndex];
+                GUILayout.EndHorizontal();
+
+                TEditor.Space();
+            }
+
+            // Output
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            GUILayout.Label("Output Resource", customStyle);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            TEditor.HorizontalBorder();
+            outputCount.intValue = EditorGUILayout.IntField(outputCount.intValue, GUILayout.Width(TEditor.FieldWidth));
+            TEditor.Tab();
+            int outputIndex = TEditor.GetResourceIndex(outputResource.stringValue, resourceIdentifiers);
+            outputIndex = EditorGUILayout.Popup(outputIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+            outputResource.stringValue = resourceIdentifiers[outputIndex];
+            GUILayout.EndHorizontal();
+        }
+
+        TEditor.VerticalBorder();
+        GUILayout.EndVertical();
+        TEditor.Space();
+    }
+
+    private void DeleteElement()
+    {
+        for (int index = 0; index < deleteElements.Length; index++)
+            if (deleteElements[index])
+            {
+                levels.DeleteArrayElementAtIndex(index);
+                levelsCount = levels.arraySize;
+            }
+    }
+
+    private void AddLevelButton()
+    {
+        GUIStyle buttonText = new GUIStyle(GUI.skin.button);
+        buttonText.fontStyle = FontStyle.BoldAndItalic;
+        buttonText.normal.textColor = Color.white;
+        buttonText.fontSize = 14;
+
+        if (GUILayout.Button("Add Level", buttonText, GUILayout.Height(70)))
+            levels.InsertArrayElementAtIndex(levelsCount);
     }
 }

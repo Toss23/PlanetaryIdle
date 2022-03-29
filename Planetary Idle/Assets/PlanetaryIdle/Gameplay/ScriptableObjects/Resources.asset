@@ -17,14 +17,11 @@ MonoBehaviour:
     haveMaximum: 0
     identifierMaximum: ResourceMaximum
     maximum: 0
-    dataKey: Gold
   - identifier: Coal
     haveMaximum: 0
     identifierMaximum: CoalMaximum
     maximum: 0
-    dataKey: Coal
   - identifier: Watt
     haveMaximum: 1
     identifierMaximum: WattCapacity
     maximum: 100
-    dataKey: Watt

@@ -13,11 +13,23 @@ MonoBehaviour:
   m_Name: Coal Miner
   m_EditorClassIdentifier: 
   levels:
-  - priceResource: 
-    price: 0
+  - priceResource: Gold
+    price: 1
     inputResource: 
     inputCount: 0
     outputResource: 
     outputCount: 0
+  - priceResource: Gold
+    price: 2
+    inputResource: Gold
+    inputCount: 0
+    outputResource: Coal
+    outputCount: 2
+  - priceResource: Gold
+    price: 5
+    inputResource: Gold
+    inputCount: 0
+    outputResource: Coal
+    outputCount: 4
   productionInterval: 1
-  haveInput: 1
+  haveInput: 0

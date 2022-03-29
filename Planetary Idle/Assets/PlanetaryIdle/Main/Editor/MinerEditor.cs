@@ -1,40 +1,26 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 
 [CustomEditor(typeof(Miner))]
 public class MinerEditor : Editor
 {
-    // Style Configuration
-    private GUIStyle mainTitle;
-    private int space = 5;
-    private int textWidth = 120;
-    private int fieldWidth = 200;
-
     // Properties
     private SerializedProperty resourceIdentifier;
     private SerializedProperty level;
     private SerializedProperty configuration;
 
-    // Resources System
-    private ResourcesSystem resourcesSystem;
+    // Resources Identifiers
     private string[] resourceIdentifiers;
 
     private void OnEnable()
     {
-        // Style Configuration
-        mainTitle = new GUIStyle();
-        mainTitle.fontStyle = FontStyle.BoldAndItalic;
-        mainTitle.normal.textColor = Color.white;
-        mainTitle.fontSize = 18;
-
         // Properties
         resourceIdentifier = serializedObject.FindProperty("resourceIdentifier");
         level = serializedObject.FindProperty("level");
         configuration = serializedObject.FindProperty("configuration");
 
-        // Build Resource Identifiers Array
-        BuildIdentifiersArray();
+        // Resource Identifiers
+        resourceIdentifiers = TEditor.ResourceIdentifiers();
     }
 
     public override void OnInspectorGUI()
@@ -43,37 +29,28 @@ public class MinerEditor : Editor
 
         // Title
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Miner", mainTitle);
+        GUILayout.Label("Miner", TEditor.TitleStyle());
         GUILayout.EndHorizontal();
-        GUILayout.Space(space * 2);
+        TEditor.TitleSpace();
 
         // Resource
-        int index = 0;
-        for (int i = 0; i < resourceIdentifiers.Length; i++)
+        if (resourceIdentifiers.Length != 0)
         {
-            if (resourceIdentifiers[i] == resourceIdentifier.stringValue)
-            {
-                index = i;
-                break;
-            }
-        }
-
-        if (resourcesSystem != null)
-        {
+            int index = TEditor.GetResourceIndex(resourceIdentifier.stringValue, resourceIdentifiers);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Resource: ", GUILayout.Width(textWidth));
-            index = EditorGUILayout.Popup(index, resourceIdentifiers, GUILayout.Width(fieldWidth));
+            GUILayout.Label("Resource: ", GUILayout.Width(TEditor.TextWidth));
+            index = EditorGUILayout.Popup(index, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
             resourceIdentifier.stringValue = resourceIdentifiers[index];
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Level: ", GUILayout.Width(textWidth));
-            level.intValue = EditorGUILayout.IntField(level.intValue, GUILayout.Width(fieldWidth));
+            GUILayout.Label("Level: ", GUILayout.Width(TEditor.TextWidth));
+            level.intValue = EditorGUILayout.IntField(level.intValue, GUILayout.Width(TEditor.FieldWidth));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Configuration: ", GUILayout.Width(textWidth));
-            configuration.objectReferenceValue = EditorGUILayout.ObjectField(configuration.objectReferenceValue, typeof(Configuration), true, GUILayout.Width(fieldWidth));
+            GUILayout.Label("Configuration: ", GUILayout.Width(TEditor.TextWidth));
+            configuration.objectReferenceValue = EditorGUILayout.ObjectField(configuration.objectReferenceValue, typeof(Configuration), true, GUILayout.Width(TEditor.FieldWidth));
             GUILayout.EndHorizontal();
         }
         else
@@ -84,31 +61,5 @@ public class MinerEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
-    }
-
-    private void BuildIdentifiersArray()
-    {
-        GameObject gameObject = GameObject.FindWithTag("ResourcesSystem");
-        if (gameObject != null)
-        {
-            resourcesSystem = gameObject.GetComponent<ResourcesSystem>();
-            ResourcePrefab[] prefabs = resourcesSystem.Resources.Prefabs;
-            List<string> identifiers = new List<string>();
-
-            // Build List
-            for (int index = 0; index < prefabs.Length; index++)
-            {
-                identifiers.Add(prefabs[index].Identifier);
-                if (prefabs[index].HaveMaximum)
-                    identifiers.Add(prefabs[index].IdentifierMaximum);
-            }
-
-            // Convert List to Array
-            resourceIdentifiers = new string[identifiers.Count];
-            for (int index = 0; index < resourceIdentifiers.Length; index++)
-            {
-                resourceIdentifiers[index] = identifiers[index];
-            }
-        }
     }
 }

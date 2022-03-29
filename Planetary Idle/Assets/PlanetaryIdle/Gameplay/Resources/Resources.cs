@@ -15,7 +15,6 @@ public class ResourcePrefab
     [SerializeField] private bool haveMaximum;
     [SerializeField] private string identifierMaximum;
     [SerializeField] private int maximum;
-    [SerializeField] private string dataKey;
 
     public string Identifier { get { return identifier; } }
     public bool HaveMaximum { get { return haveMaximum; } }

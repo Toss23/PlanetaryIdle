@@ -2265,6 +2265,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51f6f015eeeebdf4ab59935065718c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceIdentifier: Coal
+  resourceIdentifier: Gold
   level: 1
   configuration: {fileID: 11400000, guid: 84c59f045d24a9c4ebd429bcd514e4b6, type: 2}
