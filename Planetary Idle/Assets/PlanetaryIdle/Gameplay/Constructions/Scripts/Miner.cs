@@ -33,7 +33,7 @@ public class Miner : MonoBehaviour, IPointerClickHandler
             productionTimer = configuration.ProductionInterval;
 
             // Action on production circle end
-            resource.Add(configuration.Productions[level]);
+            resource.Add(configuration.Levels[level].OutputCount);
         }
     }
 

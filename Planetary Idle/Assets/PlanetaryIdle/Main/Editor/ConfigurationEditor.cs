@@ -6,22 +6,22 @@ using UnityEditor;
 public class ConfigurationEditor : Editor
 {
     // Style Configuration
+    private Color defaultColor;
     private GUIStyle mainTitle;
+    private GUIStyle subTitle;
+
     private int space = 5;
-    private int textWidth = 120;
-    private int fieldWidth = 200;
+    private int border = 5;
+
+    private int textWidth = 70;
+    private int fieldWidth = 100;
+    private int toggleWidth = 15;
+    private int tab = 5;
 
     // Properties
-    private SerializedProperty priceRersource;
-    private SerializedProperty prices;
-
-    private SerializedProperty haveConsumption;
-    private SerializedProperty resourceInput;
-    private SerializedProperty consumptions;
-
-    private SerializedProperty productionInterval;
-    private SerializedProperty resourceOutput;
-    private SerializedProperty productions;
+    private int levelsCount;
+    private SerializedProperty levels;
+    private SerializedProperty haveInput;
 
     // Resources System
     private ResourcesSystem resourcesSystem;
@@ -30,13 +30,22 @@ public class ConfigurationEditor : Editor
     private void OnEnable()
     {
         // Style Configuration
+        defaultColor = GUI.backgroundColor;
+
         mainTitle = new GUIStyle();
         mainTitle.fontStyle = FontStyle.BoldAndItalic;
         mainTitle.normal.textColor = Color.white;
         mainTitle.fontSize = 18;
 
-        // Properties
+        subTitle = new GUIStyle();
+        subTitle.fontStyle = FontStyle.BoldAndItalic;
+        subTitle.normal.textColor = Color.white;
+        subTitle.fontSize = 16;
 
+        // Properties
+        levels = serializedObject.FindProperty("levels");
+        levelsCount = levels.arraySize;
+        haveInput = serializedObject.FindProperty("haveInput");
 
         // Build Resource Identifiers Array
         BuildIdentifiersArray();
@@ -52,7 +61,54 @@ public class ConfigurationEditor : Editor
         GUILayout.EndHorizontal();
         GUILayout.Space(space * 2);
 
-        // 
+        // Levels
+        if (levelsCount == 0 || levels == null)
+        {
+            levelsCount = 1;
+            levels.arraySize = levelsCount;
+        }
+
+        if (resourcesSystem != null)
+        {
+            for (int level = 0; level < levelsCount; level++)
+            {
+                SerializedProperty serializedProperty = levels.GetArrayElementAtIndex(level);
+                SerializedProperty priceResource = serializedProperty.FindPropertyRelative("priceResource");
+                SerializedProperty price = serializedProperty.FindPropertyRelative("price");
+
+                GUILayout.BeginVertical(GUI.skin.button);
+                GUILayout.Space(border);
+                if (level == 0)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("", GUILayout.Width(border));
+                    GUILayout.Label("Build price", subTitle);
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("", GUILayout.Width(border));
+                    GUILayout.Label("Value: ", GUILayout.Width(textWidth));
+                    price.intValue = EditorGUILayout.IntField(price.intValue, GUILayout.Width(fieldWidth));
+                    GUILayout.Label("", GUILayout.Width(tab));
+                    GUILayout.Label("Resource: ", GUILayout.Width(textWidth));
+                    priceResource.stringValue = EditorGUILayout.TextField(priceResource.stringValue, GUILayout.Width(fieldWidth));
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+
+                }
+                GUILayout.Space(border);
+                GUILayout.EndVertical();
+                GUILayout.Space(space);
+            }
+        }
+        else
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Please create Resources System component and mark by Tag");
+            GUILayout.EndHorizontal();
+        }
 
         serializedObject.ApplyModifiedProperties();
     }

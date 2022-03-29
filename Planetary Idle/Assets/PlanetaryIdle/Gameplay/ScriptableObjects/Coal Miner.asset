@@ -12,14 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32fecd0e98317604e9c9c4091a53ba07, type: 3}
   m_Name: Coal Miner
   m_EditorClassIdentifier: 
-  priceRersource:
-  - Gold
-  prices: 01000000
-  haveConsumption: 0
-  resourceInput: []
-  consumptions: 
+  levels:
+  - priceResource: 
+    price: 0
+    inputResource: 
+    inputCount: 0
+    outputResource: 
+    outputCount: 0
   productionInterval: 1
-  resourceOutput:
-  - Coal
-  - Coal
-  productions: 0000000002000000
+  haveInput: 1
