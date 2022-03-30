@@ -50,6 +50,7 @@ public abstract class View : MonoBehaviour
     public void ShowView()
     {
         UpdateView();
+        HideAll();
         content.SetActive(true);
     }
 

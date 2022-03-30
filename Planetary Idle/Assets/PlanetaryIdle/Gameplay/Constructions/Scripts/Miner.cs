@@ -4,13 +4,14 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(BoxCollider))]
 public class Miner : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] private string resourceIdentifier;
     [SerializeField] private int level;
     [SerializeField] private Configuration configuration;
 
     private Resource resource;
     private float productionTimer;
 
+    public string ResourceIdentifier { get { return configuration.Levels[1].OutputResource; } }
+    public int Level { get { return level; } set { level = value; } }
     public Configuration Configuration { get { return configuration; } }
 
     private void Awake()
@@ -21,7 +22,7 @@ public class Miner : MonoBehaviour, IPointerClickHandler
 
     private void Start()
     {
-        resource = ResourcesSystem.Find(resourceIdentifier);
+        resource = ResourcesSystem.Find(ResourceIdentifier);
     }
 
     private void Update()
@@ -39,6 +40,6 @@ public class Miner : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Show UI
+        MinerView.ShowView(this);
     }
 }
