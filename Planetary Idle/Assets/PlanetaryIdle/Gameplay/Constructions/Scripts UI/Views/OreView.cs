@@ -8,7 +8,6 @@ public class OreView : View
     [Header("View")]
     [SerializeField] private Text oreNameText;
     [SerializeField] private Text productionText;
-    [SerializeField] private Text upgradeText;
 
     private Ore selectedOre;
 
@@ -35,6 +34,4 @@ public class OreView : View
         if (ResourcesSystem.Find("Gold").Spend(selectedOre.MinerPrice))
             selectedOre.BuildMiner();
     }
-
-    protected override void OnClickDestroy() { }
 }

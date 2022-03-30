@@ -8,11 +8,16 @@ public abstract class View : MonoBehaviour
 
     [Header("Default")]
     [SerializeField] private GameObject content;
+    [SerializeField] private UpgradeHint upgradeHint;
+    protected Color hintColor;
 
     [Header("Buttons")]
     [SerializeField] private Button escapeButton;
     [SerializeField] private Button upgradeButton;
+    [SerializeField] private Text upgradeButtonText;
     [SerializeField] private Button destroyButton;
+
+    protected Text upgradeText { get { return upgradeButtonText; } }
 
     private void Awake()
     {
@@ -35,14 +40,44 @@ public abstract class View : MonoBehaviour
             destroyButton.onClick.AddListener(HideView);
         }
 
+        // Hint
+        if (upgradeHint != null)
+            hintColor = upgradeHint.gameObject.GetComponentInChildren<Text>().color;
+
         HideView();
         Initialize();
+    }
+
+    private void FixedUpdate()
+    {
+        if (content.activeSelf && upgradeHint != null)
+        {
+            if (upgradeHint.Focused)
+            {
+                OnUpgradeButtonFocused();
+            }
+            else
+            {
+                OnUpgradeButtonUnfocused();
+                UpdateView();
+            }
+        }
     }
 
     /// <summary>
     /// Realized after Awake
     /// </summary>
     protected abstract void Initialize();
+
+    protected void EnableUpgrade()
+    {
+        upgradeButton.enabled = true;
+    }
+
+    protected void DisableUpgrade()
+    {
+        upgradeButton.enabled = false;
+    }
 
     /// <summary>
     /// This method is Update and Show View
@@ -65,6 +100,12 @@ public abstract class View : MonoBehaviour
     protected abstract void UpdateView();
 
     /// <summary>
+    /// This method is called on cursor moved on Upgrade button
+    /// </summary>
+    protected virtual void OnUpgradeButtonFocused() { }
+    protected virtual void OnUpgradeButtonUnfocused() { }
+
+    /// <summary>
     /// This method is called on click Upgrade Button
     /// </summary>
     protected abstract void OnClickUpgrade();
@@ -72,7 +113,7 @@ public abstract class View : MonoBehaviour
     /// <summary>
     /// This method is called on click Destroy Button
     /// </summary>
-    protected abstract void OnClickDestroy();
+    protected virtual void OnClickDestroy() { }
 
     /// <summary>
     /// This method is Hide All Views

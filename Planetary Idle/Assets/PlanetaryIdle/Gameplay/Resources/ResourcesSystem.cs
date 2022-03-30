@@ -23,6 +23,9 @@ public class ResourcesSystem : MonoBehaviour
             else
                 Resource.Create(resource.Identifier, transform);
         }
+
+        // Start
+        Find("Gold").Add(10000);
     }
 
     /// <summary>

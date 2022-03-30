@@ -8,13 +8,15 @@ public class MinerView : View
     [Header("View")]
     [SerializeField] private Text minerNameText;
     [SerializeField] private Text productionText;
-    [SerializeField] private Text upgradeText;
 
     private Miner selectedMiner;
+
+    private Color productionTextColor;
 
     protected override void Initialize()
     {
         Instance = this;
+        productionTextColor = Instance.productionText.color;
     }
 
     public static void ShowView(Miner miner)
@@ -28,16 +30,38 @@ public class MinerView : View
         ConfigurationLevel level = selectedMiner.Configuration.Levels[selectedMiner.Level];
         Instance.minerNameText.text = "Name: " + selectedMiner.ResourceIdentifier + " Miner";
         Instance.productionText.text = "Produce: " + level.OutputCount + " " + level.OutputResource + " / Sec";
-        Instance.upgradeText.text = "Upgrade (" + level.Price + " " + level.PriceResource + ")";
+
+        if (selectedMiner.Level < selectedMiner.MaxLevel)
+        {
+            Instance.EnableUpgrade();
+            Instance.upgradeText.text = "Upgrade (" + level.Price + " " + level.PriceResource + ")";
+        }
+        else
+        {
+            Instance.DisableUpgrade();
+            Instance.upgradeText.text = "Max Level";
+        }
+    }
+
+    protected override void OnUpgradeButtonFocused()
+    {
+        if (selectedMiner.Level + 1 <= selectedMiner.MaxLevel)
+        {
+            ConfigurationLevel level = selectedMiner.Configuration.Levels[selectedMiner.Level + 1];
+            Instance.productionText.color = hintColor;
+            Instance.productionText.text = "Produce: " + level.OutputCount + " " + level.OutputResource + " / Sec";
+        }
+    }
+
+    protected override void OnUpgradeButtonUnfocused()
+    {
+        Instance.productionText.color = productionTextColor;
     }
 
     protected override void OnClickUpgrade()
     {
-
-    }
-
-    protected override void OnClickDestroy()
-    {
-        
+        ConfigurationLevel level = selectedMiner.Configuration.Levels[selectedMiner.Level];
+        if (ResourcesSystem.Find(level.PriceResource).Spend(level.Price))
+            selectedMiner.Level++;
     }
 }
