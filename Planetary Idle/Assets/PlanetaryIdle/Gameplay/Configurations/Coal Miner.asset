@@ -33,3 +33,6 @@ MonoBehaviour:
     outputCount: 4
   productionInterval: 1
   haveInput: 0
+  priceResourceSame: 1
+  inputResourceSame: 1
+  outputResourceSame: 1

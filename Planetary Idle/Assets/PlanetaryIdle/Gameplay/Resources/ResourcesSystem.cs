@@ -41,6 +41,12 @@ public class ResourcesSystem : MonoBehaviour
     /// </summary>
     public static Resource Find(string identifier)
     {
+        if (identifier == "Null")
+        {
+            Debug.LogError("You try find <Null> resource... Please check configurations");
+            return null;
+        }
+
         foreach (Resource resource in resources)
         {
             if (resource.Identifier == identifier)

@@ -11,6 +11,14 @@ public class ConfigurationEditor : Editor
     private int levelsCount;
     private SerializedProperty levels;
     private SerializedProperty haveInput;
+    private SerializedProperty priceResourceSame;
+    private SerializedProperty inputResourceSame;
+    private SerializedProperty outputResourceSame;
+
+    // For same resources
+    private string priceResource;
+    private string inputResource;
+    private string outputResource;
 
     // Resources System
     private string[] resourceIdentifiers;
@@ -24,6 +32,9 @@ public class ConfigurationEditor : Editor
         // Properties
         levels = serializedObject.FindProperty("levels");
         haveInput = serializedObject.FindProperty("haveInput");
+        priceResourceSame = serializedObject.FindProperty("priceResourceSame");
+        inputResourceSame = serializedObject.FindProperty("inputResourceSame");
+        outputResourceSame = serializedObject.FindProperty("outputResourceSame");
 
         // Build Resource Identifiers Array
         resourceIdentifiers = TEditor.ResourceIdentifiers();
@@ -41,9 +52,28 @@ public class ConfigurationEditor : Editor
 
         // Have Input
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Have Input Resource: ", GUILayout.Width(130));
+        GUILayout.Label("Have Input Resource: ", GUILayout.Width(150));
         haveInput.boolValue = EditorGUILayout.Toggle(haveInput.boolValue, GUILayout.Width(TEditor.ToggleWidth));
         GUILayout.EndHorizontal();
+
+        // Price Resource Same
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Price Resource Same: ", GUILayout.Width(150));
+        priceResourceSame.boolValue = EditorGUILayout.Toggle(priceResourceSame.boolValue, GUILayout.Width(TEditor.ToggleWidth));
+        GUILayout.EndHorizontal();
+
+        // Input Resource Same
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Input Resource Same: ", GUILayout.Width(150));
+        inputResourceSame.boolValue = EditorGUILayout.Toggle(inputResourceSame.boolValue, GUILayout.Width(TEditor.ToggleWidth));
+        GUILayout.EndHorizontal();
+
+        // Output Resource Same
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Output Resource Same: ", GUILayout.Width(150));
+        outputResourceSame.boolValue = EditorGUILayout.Toggle(outputResourceSame.boolValue, GUILayout.Width(TEditor.ToggleWidth));
+        GUILayout.EndHorizontal();
+
         TEditor.Space();
 
         // Levels
@@ -87,6 +117,13 @@ public class ConfigurationEditor : Editor
 
         GUILayout.BeginVertical(GUI.skin.button);
         TEditor.VerticalBorder();
+
+        if (level == 1)
+        {
+            this.priceResource = priceResource.stringValue;
+            this.inputResource = inputResource.stringValue;
+            this.outputResource = outputResource.stringValue;
+        }
 
         if (level == 0)
         {
@@ -137,10 +174,17 @@ public class ConfigurationEditor : Editor
             GUILayout.BeginHorizontal();
             TEditor.HorizontalBorder();
             price.intValue = EditorGUILayout.IntField(price.intValue, GUILayout.Width(TEditor.FieldWidth));
-            TEditor.Tab();
-            int priceIndex = TEditor.GetResourceIndex(priceResource.stringValue, resourceIdentifiers);
-            priceIndex = EditorGUILayout.Popup(priceIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
-            priceResource.stringValue = resourceIdentifiers[priceIndex];
+            if (level <= 1 || priceResourceSame.boolValue == false)
+            {
+                TEditor.Tab();
+                int priceIndex = TEditor.GetResourceIndex(priceResource.stringValue, resourceIdentifiers);
+                priceIndex = EditorGUILayout.Popup(priceIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+                priceResource.stringValue = resourceIdentifiers[priceIndex];
+            }
+            else
+            {
+                priceResource.stringValue = this.priceResource;
+            }
             GUILayout.EndHorizontal();
 
             TEditor.Space();
@@ -153,13 +197,21 @@ public class ConfigurationEditor : Editor
                 GUILayout.Label("Input Resource", customStyle);
                 GUILayout.EndHorizontal();
 
+                
                 GUILayout.BeginHorizontal();
                 TEditor.HorizontalBorder();
                 inputCount.intValue = EditorGUILayout.IntField(inputCount.intValue, GUILayout.Width(TEditor.FieldWidth));
-                TEditor.Tab();
-                int inputIndex = TEditor.GetResourceIndex(inputResource.stringValue, resourceIdentifiers);
-                inputIndex = EditorGUILayout.Popup(inputIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
-                inputResource.stringValue = resourceIdentifiers[inputIndex];
+                if (level == 1 || inputResourceSame.boolValue == false)
+                {
+                    TEditor.Tab();
+                    int inputIndex = TEditor.GetResourceIndex(inputResource.stringValue, resourceIdentifiers);
+                    inputIndex = EditorGUILayout.Popup(inputIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+                    inputResource.stringValue = resourceIdentifiers[inputIndex];
+                }
+                else
+                {
+                    inputResource.stringValue = this.inputResource;
+                }
                 GUILayout.EndHorizontal();
 
                 TEditor.Space();
@@ -174,10 +226,17 @@ public class ConfigurationEditor : Editor
             GUILayout.BeginHorizontal();
             TEditor.HorizontalBorder();
             outputCount.intValue = EditorGUILayout.IntField(outputCount.intValue, GUILayout.Width(TEditor.FieldWidth));
-            TEditor.Tab();
-            int outputIndex = TEditor.GetResourceIndex(outputResource.stringValue, resourceIdentifiers);
-            outputIndex = EditorGUILayout.Popup(outputIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
-            outputResource.stringValue = resourceIdentifiers[outputIndex];
+            if (level == 1 || outputResourceSame.boolValue == false)
+            {
+                TEditor.Tab();
+                int outputIndex = TEditor.GetResourceIndex(outputResource.stringValue, resourceIdentifiers);
+                outputIndex = EditorGUILayout.Popup(outputIndex, resourceIdentifiers, GUILayout.Width(TEditor.FieldWidth));
+                outputResource.stringValue = resourceIdentifiers[outputIndex];
+            }
+            else
+            {
+                outputResource.stringValue = this.outputResource;
+            }
             GUILayout.EndHorizontal();
         }
 

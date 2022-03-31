@@ -6,10 +6,17 @@ public class Configuration : ScriptableObject
     [SerializeField] private ConfigurationLevel[] levels;
     [SerializeField] private int productionInterval = 1;
     [SerializeField] private bool haveInput = true;
+    [SerializeField] private bool priceResourceSame = true;
+    [SerializeField] private bool inputResourceSame = true;
+    [SerializeField] private bool outputResourceSame = true;
 
     public ConfigurationLevel[] Levels { get { return levels; } }
     public int ProductionInterval { get { return productionInterval; } }
     public bool HaveInput { get { return haveInput; } }
+
+    public string PriceResource { get { return priceResourceSame ? levels[1].PriceResource : "Null"; } }
+    public string InputResource { get { return inputResourceSame ? levels[1].InputResource : "Null"; } }
+    public string OutputResource { get { return outputResourceSame ? levels[1].OutputResource : "Null"; } }
 }
 
 [System.Serializable]

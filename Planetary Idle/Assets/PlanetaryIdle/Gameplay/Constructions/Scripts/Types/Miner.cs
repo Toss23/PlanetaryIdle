@@ -10,7 +10,7 @@ public class Miner : MonoBehaviour, IPointerClickHandler
     private Resource resource;
     private float productionTimer;
 
-    public string ResourceIdentifier { get { return configuration.Levels[1].OutputResource; } }
+    public string ResourceIdentifier { get { return configuration.OutputResource; } }
     public int Level { get { return level; } set { level = value; } }
     public int MaxLevel { get { return configuration.Levels.Length - 1; } }
     public Configuration Configuration { get { return configuration; } }
