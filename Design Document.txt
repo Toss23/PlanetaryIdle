@@ -1,0 +1,49 @@
+---------------
+  In progress
+---------------
+
+- Sell resource function and UI
+- Resouces price setting
+
+- Generator
+- Battary ? For what
+
+- Science
+- Auto Save and Load
+
+
+----------------
+     Ideas
+----------------
+
+Global
+- You need open 4 measurement for time travel
+- Start point = End point
+
+Planets
+- Earth
+- Mars ? in far future
+
+Ores
+- Coal: 1 Gold
+- Tin: 
+- Copper: 
+- Iron: 
+- Uran: 
+- Titan: 
+
+Generators
+- Simple Generator (2 W)
+- Coal Generator (10 W) <- Coal
+- Nuclear Generator (50 W) <- Uran
+
+Science
+Mine "Science Cubes" and reseach tehnologies (auto-reseach)
+Gold Cubes? - Convert Gold in Gold Cubes
+
+Reforge ? (Furnaces)
+- Bronze <- Tin + Copper
+- Steel <- Iron + Coal
+
+Other
+Auto-sell resource if enabled
